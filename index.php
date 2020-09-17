@@ -1,11 +1,40 @@
 <?php
+class Calculations
+{
 
-class FileUpdate
+    function get_dividend($a, $b)
+    {
+        return $a / $b;
+    }
+
+    function get_remainder($a, $b)
+    {
+        return $a % $b;
+    }
+
+    function get_multiply($a, $b)
+    {
+        return $a * $b;
+    }
+
+    function get_difference($a, $b)
+    {
+        return $a - $b;
+    }
+
+    function get_addition($a, $b)
+    {
+        return $a + $b;
+    }
+}
+
+class FileUpdate extends Calculations
 {
     private $filepath;
     private $counter_value;
     private $total_hits;
-    function __construct() {
+    function __construct()
+    {
         $this->counter_value = 0;
         $this->total_hits = 0;
         $this->filepath = 'data.json';
@@ -43,12 +72,13 @@ class FileUpdate
         foreach ($temp_data as $temp_data_key => &$temp_data_value) {
             if ($temp_data_key == 'bees_val') {
                 foreach ($temp_data_value as $key => &$value) {
-                    $value['total_hit_points'] = $value['count'] * $value['life'];
+                    $value['total_hit_points'] = $this->get_multiply($value['count'], $value['life']);
                 }
             }
         }
 
-        if (json_encode($temp_data) == json_encode($initial_data)) {} else {
+        if (json_encode($temp_data) == json_encode($initial_data)) {
+        } else {
             $this->write_in_file($temp_data);
         }
 
@@ -60,9 +90,9 @@ class FileUpdate
     {
 
         $initial_data = $this->file_read();
-        if(!isset($initial_data)) {
-            $this->counter_value = $this->counter_value + 1;
-            if($this->counter_value == 3) {
+        if (!isset($initial_data)) {
+            $this->counter_value = $this->get_addition($this->counter_value, 1);
+            if ($this->counter_value == 3) {
                 $message = "its ends here";
                 $this->game_over($message, true);
             }
@@ -83,7 +113,7 @@ class FileUpdate
                 }
             }
         }
-        
+
         return $temp_data;
     }
 
@@ -91,48 +121,45 @@ class FileUpdate
     {
         $initial_data = $this->alive_bees();
         $temp_data = $initial_data;
+        $temp_hit_value = 0;
+        $allow_temp_hit_value = false;
 
         if (isset($temp_data) && isset($temp_data['bees_val']) && count($temp_data['bees_val']) > 0) {
 
-            $random_index = rand(0, count($temp_data['bees_val']) - 1);
+            $random_index = rand(0, $this->get_difference(count($temp_data['bees_val']), 1));
 
             if (isset($random_index)) {
                 if (isset($temp_data['bees_val'][$random_index]['total_hit_points']) && isset($temp_data['bees_val'][$random_index]['hit'])) {
+
+                    $is_not_divisible = $this->get_remainder($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_data['bees_val'][$random_index]['life']);
                     
-                    $remainder = $temp_data['bees_val'][$random_index]['total_hit_points'] % $temp_data['bees_val'][$random_index]['hit'];
-                    $alternate_value = false;
 
-
-
-                    print_r('remainder : '.$remainder);
-                    // print_r('remainder : '.$remainder);
-                    /* if(isset($remainder) && $remainder < $temp_data['bees_val'][$random_index]['hit']) {
-                        $alternate_value = true;
-                    } */
-
-                    if ($alternate_value) {
-                        $temp_data['bees_val'][$random_index]['total_hit_points'] = $temp_data['bees_val'][$random_index]['total_hit_points'] - $remainder;
-                    } else {
-                        $temp_data['bees_val'][$random_index]['total_hit_points'] = $temp_data['bees_val'][$random_index]['total_hit_points'] - $temp_data['bees_val'][$random_index]['hit'];
-
-                    }
-                    if ($alternate_value) {
-                        $this->total_hits += $remainder;
-                    } else {
-                        $this->total_hits += $temp_data['bees_val'][$random_index]['hit'];
+                    if(!$is_not_divisible) {} else {
+                        if ($is_not_divisible < $temp_data['bees_val'][$random_index]['hit']) {
+                            $allow_temp_hit_value = true;
+                            $temp_hit_value = $is_not_divisible;
+                        }
                     }
 
-                    if ( ($temp_data['bees_val'][$random_index]['type'] == 'queen') && ($temp_data['bees_val'][$random_index]['total_hit_points'] < 1)) {
+                    if($allow_temp_hit_value) {
+                        $temp_data['bees_val'][$random_index]['total_hit_points'] = $this->get_difference($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_hit_value);
+                        $this->total_hits = $this->get_addition($this->total_hits,  $temp_hit_value);
+                    } else {
+                        $temp_data['bees_val'][$random_index]['total_hit_points'] = $this->get_difference($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_data['bees_val'][$random_index]['hit']);
+                        $this->total_hits = $this->get_addition($this->total_hits,  $temp_data['bees_val'][$random_index]['hit']);
+                    }
+
+                    if (($temp_data['bees_val'][$random_index]['type'] == 'queen') && ($temp_data['bees_val'][$random_index]['total_hit_points'] < 1)) {
                         $message = 'Game Over. You have killed the Queen';
                         $this->game_over($message, true);
                     } else {
-                        $remainder = $temp_data['bees_val'][$random_index]['total_hit_points'] % $temp_data['bees_val'][$random_index]['life'];
-                        if (!$remainder) {
-                            $message = 'You have killed a '. $temp_data['bees_val'][$random_index]['type'];
+                        $is_not_divisible = $this->get_remainder($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_data['bees_val'][$random_index]['life']);
+                        if (!$is_not_divisible) {
+                            $message = 'You have killed a ' . $temp_data['bees_val'][$random_index]['type'];
                         } else {
-                            $message = 'You have hit a '.$temp_data['bees_val'][$random_index]['type'].'. Now its remaining health is '. $remainder;
+                            $message = 'You have hit a ' . $temp_data['bees_val'][$random_index]['type'] . '. Now its remaining health is ' . $is_not_divisible;
                         }
-                        $this->game_over($message , false);
+                        $this->game_over($message, false);
                     }
                 } else {
                     $message = "Some error occured. Please try again";
@@ -143,7 +170,7 @@ class FileUpdate
             $message = "Some error occured. Please try again";
             $this->game_over($message, true);
         }
-        
+
         if (json_encode($temp_data) == json_encode($initial_data)) {
         } else {
             $this->write_in_file($temp_data);
@@ -152,17 +179,19 @@ class FileUpdate
     }
 
 
-    function game_over($message , $status) {
+    function game_over($message, $status)
+    {
         $this->create_set_up();
-        echo $message.PHP_EOL;
+        echo $message . PHP_EOL;
         if ($status) {
-            echo 'It took you '. $this->total_hits. ' to end the Game.' .PHP_EOL;
+            echo 'It took you ' . $this->total_hits . ' to end the Game.' . PHP_EOL;
             exit();
         }
         return true;
     }
 
-    function play_game() {
+    function play_game()
+    {
         $commandLine = readline(('Hit Enter'));
         $this->kill_bees();
         $this->play_game();
