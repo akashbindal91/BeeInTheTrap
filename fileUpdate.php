@@ -30,7 +30,20 @@ class FileUpdate extends Calculations
 
     function write_in_file($value)
     {
-        $json = json_encode($value);
+        $file = $this->file_read();
+        if (isset($file['bees_val']) && isset($value['bees_val'])) {
+            $type_array = array_column( $value['bees_val'], 'type');
+            
+            foreach ($file['bees_val'] as &$_value) {
+                if( in_array($_value['type'] , $type_array) ) {
+                    $index = array_search($_value['type'] , $type_array);
+                    $_value = $value['bees_val'][$index];
+                } else {
+                    $_value['total_hit_points'] = 0;
+                }
+            }
+        }
+        $json = json_encode($file);
         if (file_put_contents($this->filepath, $json)) {
             return $this->file_read();
         } else {
@@ -82,7 +95,7 @@ class FileUpdate extends Calculations
                             $message = "Queen is dead. Game over";
                             $this->game_over($message, true);
                         }
-                        unset($temp_data_value[$key]);
+                        array_splice($temp_data_value, $key, 1);
                     }
                 }
             }
@@ -100,22 +113,27 @@ class FileUpdate extends Calculations
 
         if (isset($temp_data) && isset($temp_data['bees_val']) && count($temp_data['bees_val']) > 0) {
 
-            $random_index = rand(0, $this->get_difference(count($temp_data['bees_val']), 1));
+            if (count($temp_data['bees_val']) > 1) {
+                $random_index = rand(0, $this->get_difference(count($temp_data['bees_val']), 1));
+            } else {
+                $random_index = 0;
+            }
 
             if (isset($random_index)) {
                 if (isset($temp_data['bees_val'][$random_index]['total_hit_points']) && isset($temp_data['bees_val'][$random_index]['hit'])) {
 
                     $is_not_divisible = $this->get_remainder($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_data['bees_val'][$random_index]['life']);
-                    
 
-                    if(!$is_not_divisible) {} else {
+
+                    if (!$is_not_divisible) {
+                    } else {
                         if ($is_not_divisible < $temp_data['bees_val'][$random_index]['hit']) {
                             $allow_temp_hit_value = true;
                             $temp_hit_value = $is_not_divisible;
                         }
                     }
 
-                    if($allow_temp_hit_value) {
+                    if ($allow_temp_hit_value) {
                         $temp_data['bees_val'][$random_index]['total_hit_points'] = $this->get_difference($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_hit_value);
                         $this->total_hits = $this->get_addition($this->total_hits,  $temp_hit_value);
                     } else {
@@ -137,11 +155,11 @@ class FileUpdate extends Calculations
                     }
                 } else {
                     $message = "Some error occured. Please try again";
-                    $this->game_over($message, true);
+                    $this->game_over($message, false);
                 }
             }
         } else {
-            $message = "Some error occured. Please try again";
+            $message = "Game Over. You have killed All the bees";
             $this->game_over($message, true);
         }
 
@@ -158,7 +176,7 @@ class FileUpdate extends Calculations
         $this->create_set_up();
         echo $message . PHP_EOL;
         if ($status) {
-            echo 'It took you ' . $this->total_hits . ' to end the Game.' . PHP_EOL;
+            echo 'It took you ' . $this->total_hits . ' hits to end the Game.' . PHP_EOL;
             exit();
         }
         return true;
