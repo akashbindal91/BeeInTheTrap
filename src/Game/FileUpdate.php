@@ -3,8 +3,6 @@
 
 namespace Game;
 
-include 'Calculations.php';
-
 class FileUpdate extends Calculations
 {
     private $filepath;
@@ -203,7 +201,7 @@ class FileUpdate extends Calculations
 
     function play_game()
     {
-        // $commandLine = readline(('Hit Enter'));
+        $commandLine = readline(('Hit Enter'));
         $this->total_hit_count = $this->get_addition($this->total_hit_count,  1);
         $this->kill_bees();
         $this->play_game();
