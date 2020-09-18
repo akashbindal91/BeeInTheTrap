@@ -20,11 +20,6 @@ class FileUpdate extends Calculations
         $this->filepath = 'data.json';
     }
 
-    function get_name()
-    {
-        return $this->name;
-    }
-
     function file_read()
     {
         $myfile = fopen($this->filepath, "r") or die("Unable to open file!");
