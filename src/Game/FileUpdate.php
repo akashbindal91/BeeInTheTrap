@@ -1,6 +1,9 @@
 <?php
 
-require 'calculations.php';
+
+namespace Game;
+
+include 'Calculations.php';
 
 class FileUpdate extends Calculations
 {
@@ -9,6 +12,7 @@ class FileUpdate extends Calculations
     private $total_hits;
     private $total_hit_count;
     private $bees_value_list;
+    
     function __construct()
     {
         $this->counter_value = 0;

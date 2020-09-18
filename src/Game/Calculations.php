@@ -1,5 +1,8 @@
 <?php
 
+
+namespace Game;
+
 class Calculations
 {
 

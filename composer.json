@@ -1,5 +1,29 @@
+// {
+//     "autoload": {
+//         "psr-4": {
+//             "Game\\": "src/Game"
+//         }
+//     },
+//     "require-dev": {
+//         "phpunit/phpunit": "^9"
+//     }
+// }
+
 {
-    "require-dev": {
-        "phpunit/phpunit": "^9"
-    }
+    "name": "game/bee",
+    "description": "A simple bee game.",
+    "type": "composer",
+    "autoload": {
+        "psr-4": {
+            "Game\\": "src/Game"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alan Cole",
+            "email": "me@alancole.io"
+        }
+    ],
+    "minimum-stability": "dev"
 }
