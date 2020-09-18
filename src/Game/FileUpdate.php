@@ -67,7 +67,7 @@ class FileUpdate extends Calculations
                 }
             }
         }
-
+        shuffle($this->bees_value_list);
 
         if (json_encode($temp_data) == json_encode($initial_data)) {
         } else {
@@ -158,9 +158,9 @@ class FileUpdate extends Calculations
                             $index = array_search($temp_data['bees_val'][$random_index]['type'], $this->bees_value_list);
                             array_splice($this->bees_value_list, $index, 1);
 
-                            $message = 'You have killed a ' . $temp_data['bees_val'][$random_index]['type'];
+                            $message = 'You have killed a ' . ucfirst($temp_data['bees_val'][$random_index]['type']);
                         } else {
-                            $message = 'You have hit a ' . $temp_data['bees_val'][$random_index]['type'] . '. Now its remaining health is ' . $is_not_divisible;
+                            $message = 'Direct Hit. You took '. ucfirst($temp_data['bees_val'][$random_index]['hit']) .' hit points from a '.ucfirst($temp_data['bees_val'][$random_index]['type']).' bee';
                         }
                         $this->game_over($message, false);
                     }
@@ -196,7 +196,14 @@ class FileUpdate extends Calculations
 
     function play_game()
     {
-        $commandLine = readline(('Hit Enter'));
+        $commandLine = readline(('Type hit : '));
+        // exit($commandLine);
+
+        if($commandLine !== 'hit') {
+            $message = 'Game Aborted. Restart Again.';
+            $this->game_over( $message , false);
+            exit();
+        }
         $this->total_hit_count = $this->get_addition($this->total_hit_count,  1);
         $this->kill_bees();
         $this->play_game();
