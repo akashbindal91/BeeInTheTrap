@@ -9,3 +9,6 @@ composer install
 
 # run test
 vendor/bin/phpunit
+
+# steps
+1. Type 'hit' to play game
