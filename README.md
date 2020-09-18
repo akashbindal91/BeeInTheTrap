@@ -11,4 +11,6 @@ composer install
 vendor/bin/phpunit
 
 # steps
-1. Type 'hit' to play game
+1. Open Terminal
+2. Type ./beesinthetrap.sh
+3. Type 'hit' to play game
