@@ -7,10 +7,14 @@ class FileUpdate extends Calculations
     private $filepath;
     private $counter_value;
     private $total_hits;
+    private $total_hit_count;
+    private $bees_value_list;
     function __construct()
     {
         $this->counter_value = 0;
         $this->total_hits = 0;
+        $this->total_hit_count = 0;
+        $this->bees_value_list = [];
         $this->filepath = 'data.json';
     }
 
@@ -56,13 +60,18 @@ class FileUpdate extends Calculations
     {
         $initial_data = $this->file_read();
         $temp_data = $initial_data;
+        // $array_val = array();
         foreach ($temp_data as $temp_data_key => &$temp_data_value) {
             if ($temp_data_key == 'bees_val') {
                 foreach ($temp_data_value as $key => &$value) {
                     $value['total_hit_points'] = $this->get_multiply($value['count'], $value['life']);
+                    for ($i=0; $i < $value['count']; $i++) {
+                        array_push($this->bees_value_list , $value['type']);
+                    }
                 }
             }
         }
+        
 
         if (json_encode($temp_data) == json_encode($initial_data)) {
         } else {
@@ -112,12 +121,31 @@ class FileUpdate extends Calculations
         $allow_temp_hit_value = false;
 
         if (isset($temp_data) && isset($temp_data['bees_val']) && count($temp_data['bees_val']) > 0) {
+            
+            if (count($this->bees_value_list) > 1) {
+                $random_key = rand(0, $this->get_difference(count($this->bees_value_list), 1));
+            } else {
+                $random_key = 0;
+            }
+            $bee_type_array = array_column($temp_data['bees_val'], 'type');
+            $random_index = array_search($this->bees_value_list[$random_key] , $bee_type_array);
 
-            if (count($temp_data['bees_val']) > 1) {
+            // print_r($this->bees_value_list[$random_key]);
+            // worker
+
+            /* $index = array_search($temp_data['bees_val'][$random_index]['type'] , $this->bees_value_list);
+            array_splice($this->bees_value_list, $index, 1);
+
+            $_value = $value['bees_val'][$index]; */
+
+            // exit();
+            // print_r($a);exit();
+            /* if (count($temp_data['bees_val']) > 1) {
                 $random_index = rand(0, $this->get_difference(count($temp_data['bees_val']), 1));
             } else {
                 $random_index = 0;
-            }
+            } */
+
 
             if (isset($random_index)) {
                 if (isset($temp_data['bees_val'][$random_index]['total_hit_points']) && isset($temp_data['bees_val'][$random_index]['hit'])) {
@@ -147,6 +175,10 @@ class FileUpdate extends Calculations
                     } else {
                         $is_not_divisible = $this->get_remainder($temp_data['bees_val'][$random_index]['total_hit_points'], $temp_data['bees_val'][$random_index]['life']);
                         if (!$is_not_divisible) {
+
+                            $index = array_search($temp_data['bees_val'][$random_index]['type'] , $this->bees_value_list);
+                            array_splice($this->bees_value_list, $index, 1);
+
                             $message = 'You have killed a ' . $temp_data['bees_val'][$random_index]['type'];
                         } else {
                             $message = 'You have hit a ' . $temp_data['bees_val'][$random_index]['type'] . '. Now its remaining health is ' . $is_not_divisible;
@@ -176,7 +208,8 @@ class FileUpdate extends Calculations
         $this->create_set_up();
         echo $message . PHP_EOL;
         if ($status) {
-            echo 'It took you ' . $this->total_hits . ' hits to end the Game.' . PHP_EOL;
+            echo 'It took you ' . $this->total_hits . ' hit points to end the Game.' . PHP_EOL;
+            echo 'It took you ' . $this->total_hit_count . ' hits to end the Game.' . PHP_EOL;
             exit();
         }
         return true;
@@ -185,6 +218,7 @@ class FileUpdate extends Calculations
     function play_game()
     {
         $commandLine = readline(('Hit Enter'));
+        $this->total_hit_count = $this->get_addition($this->total_hit_count,  1);   
         $this->kill_bees();
         $this->play_game();
     }
