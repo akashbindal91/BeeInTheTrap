@@ -5,6 +5,6 @@ use Game\FileUpdate;
 require 'vendor/autoload.php';
 
 
-$a = new Game\FileUpdate();
-$a->create_set_up();
-$a->play_game();
+$game = new Game\FileUpdate();
+$game->create_set_up();
+$game->play_game();

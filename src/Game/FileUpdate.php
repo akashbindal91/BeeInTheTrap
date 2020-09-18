@@ -10,7 +10,7 @@ class FileUpdate extends Calculations
     private $total_hits;
     private $total_hit_count;
     private $bees_value_list;
-    
+
     function __construct()
     {
         $this->counter_value = 0;
@@ -55,8 +55,8 @@ class FileUpdate extends Calculations
 
     function create_set_up()
     {
-        $initial_data = $this->file_read();
-        $temp_data = $initial_data;
+        $file_data = $this->file_read();
+        $temp_data = $file_data;
         foreach ($temp_data as $temp_data_key => &$temp_data_value) {
             if ($temp_data_key == 'bees_val') {
                 foreach ($temp_data_value as $key => &$value) {
@@ -69,20 +69,20 @@ class FileUpdate extends Calculations
         }
         shuffle($this->bees_value_list);
 
-        if (json_encode($temp_data) == json_encode($initial_data)) {
+        if (json_encode($temp_data) == json_encode($file_data)) {
         } else {
             $this->write_in_file($temp_data);
         }
 
-        $initial_data = $this->file_read();
-        return $initial_data;
+        $file_data = $this->file_read();
+        return $file_data;
     }
 
     function alive_bees()
     {
 
-        $initial_data = $this->file_read();
-        if (!isset($initial_data)) {
+        $file_data = $this->file_read();
+        if (!isset($file_data)) {
             $this->counter_value = $this->get_addition($this->counter_value, 1);
             if ($this->counter_value == 3) {
                 $message = "its ends here";
@@ -90,7 +90,7 @@ class FileUpdate extends Calculations
             }
             $this->alive_bees();
         }
-        $temp_data = $initial_data;
+        $temp_data = $file_data;
 
         foreach ($temp_data as $temp_data_key => &$temp_data_value) {
             if ($temp_data_key == 'bees_val') {
@@ -111,8 +111,8 @@ class FileUpdate extends Calculations
 
     function kill_bees()
     {
-        $initial_data = $this->alive_bees();
-        $temp_data = $initial_data;
+        $file_data = $this->alive_bees();
+        $temp_data = $file_data;
         $temp_hit_value = 0;
         $allow_temp_hit_value = false;
 
@@ -160,7 +160,7 @@ class FileUpdate extends Calculations
 
                             $message = 'You have killed a ' . ucfirst($temp_data['bees_val'][$random_index]['type']);
                         } else {
-                            $message = 'Direct Hit. You took '. ucfirst($temp_data['bees_val'][$random_index]['hit']) .' hit points from a '.ucfirst($temp_data['bees_val'][$random_index]['type']).' bee';
+                            $message = 'Direct Hit. You took ' . ucfirst($temp_data['bees_val'][$random_index]['hit']) . ' hit points from a ' . ucfirst($temp_data['bees_val'][$random_index]['type']) . ' bee';
                         }
                         $this->game_over($message, false);
                     }
@@ -174,7 +174,7 @@ class FileUpdate extends Calculations
             $this->game_over($message, true);
         }
 
-        if (json_encode($temp_data) == json_encode($initial_data)) {
+        if (json_encode($temp_data) == json_encode($file_data)) {
         } else {
             $this->write_in_file($temp_data);
         }
@@ -197,11 +197,10 @@ class FileUpdate extends Calculations
     function play_game()
     {
         $commandLine = readline(('Type hit : '));
-        // exit($commandLine);
 
-        if($commandLine !== 'hit') {
-            $message = 'Game Aborted. Restart Again.';
-            $this->game_over( $message , false);
+        if ($commandLine !== 'hit') {
+            $message =  $commandLine . ' doesnot match with \'hit\'. Game Aborted. Restart Again.';
+            $this->game_over($message, false);
             exit();
         }
         $this->total_hit_count = $this->get_addition($this->total_hit_count,  1);
