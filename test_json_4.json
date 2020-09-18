@@ -1,0 +1,1 @@
+{"bees":["queen","drones","worker"],"bees_val":[{"type":"queen","life":100,"count":4,"hit":8,"total_hit_points":100},{"type":"drones","life":50,"count":11,"hit":12,"total_hit_points":400},{"type":"worker","life":75,"count":8,"hit":10,"total_hit_points":375}]}

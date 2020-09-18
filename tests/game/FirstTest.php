@@ -42,15 +42,15 @@ class FirstTest extends TestCase  {
     }
 
     function test_file_exists() {
-        $file = $this->assertFileExists('./data.json');
+        $file = $this->assertFileExists('./test_json_1.json');
     }
     
     function test_file_is_readable() {
-        $file = $this->assertFileIsReadable('./data.json');
+        $file = $this->assertFileIsReadable('./test_json_1.json');
     }    
     
     function test_file_is_writable() {
-        $file = $this->assertFileIsWritable('./data.json');
+        $file = $this->assertFileIsWritable('./test_json_1.json');
     }
     
     function test_file_data_is_array() {
@@ -64,8 +64,8 @@ class FirstTest extends TestCase  {
     }
     
     function read_file() {
-        $myfile = fopen('./data.json', "r") or die("Unable to open file!");
-        $fileData = fread($myfile, filesize('./data.json'));
+        $myfile = fopen('./test_json_1.json', "r") or die("Unable to open file!");
+        $fileData = fread($myfile, filesize('./test_json_1.json'));
         fclose($myfile);
         return json_decode($fileData, true);
     }
